@@ -1,0 +1,27 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Gray scale colors */
+  /*--color-gray: initial;*/
+  --color-gray-900: #202225;
+  --color-gray-800: #2f3136;
+  --color-gray-700: #36393f;
+  --color-gray-600: #4f545c;
+  --color-gray-400: #d4d7dc;
+  --color-gray-300: #e3e5e8;
+  --color-gray-200: #ebedef;
+  --color-gray-100: #f2f3f5;
+  --color-greenxx: #ff7a7a;
+}
+
+@layer utilities {
+  .drag-region {
+    -webkit-app-region: drag;
+  }
+
+  .drag-no {
+    -webkit-app-region: no-drag;
+  }
+}

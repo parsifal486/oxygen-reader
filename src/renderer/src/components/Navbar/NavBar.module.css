@@ -1,0 +1,20 @@
+@import '../../assets/base.css';
+
+@layer components {
+  .NavBarButton {
+    @apply flex items-center justify-center h-10 w-10 bg-gray-300 text-blue-400
+           cursor-pointer ease-linear transition-colors;
+  }
+
+  .NavBarButton:hover {
+    @apply bg-blue-400 text-white;
+  }
+
+  :global(.dark) .NavBarButton {
+    @apply bg-gray-900 text-blue-300;
+  }
+
+  :global(.dark) .NavBarButton:hover {
+    @apply bg-blue-500 text-white;
+  }
+}
