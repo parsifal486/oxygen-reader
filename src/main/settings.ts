@@ -6,12 +6,14 @@ import * as fs from 'fs'
 export interface Settings {
   theme: 'light' | 'dark' // Theme can be either 'light' or 'dark'
   appLanguage: string // Application language (e.g., 'en', 'fr')
+  platform: string // Platform can be either 'darwin' or 'win32'
 }
 
 // Default settings if no settings file exists
 const defaultSettings: Settings = {
   theme: 'light',
-  appLanguage: 'en'
+  appLanguage: 'en',
+  platform: 'darwin'
 }
 
 // Class to manage application settings
@@ -29,6 +31,9 @@ export class SettingsManager {
 
     // Log the settings path and loaded settings for debugging
     console.log('settings==>', this.settingsPath, this.settings)
+
+    // Get the platform
+    this.settings.platform = process.platform
   }
 
   // Load settings from the file or return default settings if the file is missing or invalid
@@ -65,8 +70,8 @@ export class SettingsManager {
   }
 
   public updateSetting<K extends keyof Settings>(key: K, value: Settings[K]): void {
-    this.settings[key] = value;
-    this.saveSettings(this.settings);
+    this.settings[key] = value
+    this.saveSettings(this.settings)
   }
 
   // Save the given settings to the settings file

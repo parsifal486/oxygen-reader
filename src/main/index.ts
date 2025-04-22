@@ -1,34 +1,48 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { app, shell, BrowserWindow, ipcMain, nativeImage, Tray } from 'electron'
+import { join, dirname } from 'path'
+import { optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { settingsManager } from './settings'
+import { fileURLToPath } from 'url'
+import { fileManager } from './files'
+import { markdownManager } from './markdown'
 
 const HEADER_HEIGHT = 50
-const MACOS_TRAFFIC_LIGHT_HEIGHT = 14
+const MACOS_TRAFFIC_LIGHT_HEIGHT = 25
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+let mainWindow: BrowserWindow
 
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1000,
     height: 670,
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',
     titleBarOverlay: process.platform === 'darwin' ? { height: HEADER_HEIGHT } : false,
-    trafficLightPosition: {
-      x: 20,
-      y: HEADER_HEIGHT / 2 - MACOS_TRAFFIC_LIGHT_HEIGHT / 2
-    },
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
-    }
+    },
+    ...(process.platform === 'darwin'
+      ? {
+          trafficLightPosition: {
+            x: 20,
+            y: HEADER_HEIGHT / 2 - MACOS_TRAFFIC_LIGHT_HEIGHT / 2
+          }
+        }
+      : {})
   })
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    // Open DevTools by default
+    //mainWindow.webContents.openDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -41,6 +55,7 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
+    console.log('dirname====>', __dirname)
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
@@ -49,8 +64,19 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  //set app icon
+  //hide
+  const appIcon = nativeImage.createFromPath('./resources/icon.png')
+  app.setAppUserModelId('com.electron')
+
+  // Set dock icon for macOS
+  if (process.platform === 'darwin') {
+    app.dock.setIcon(appIcon)
+  }
+
+  // Create tray icon
+  const tray = new Tray(appIcon)
+  tray.setToolTip('Oxygen2')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -76,7 +102,61 @@ app.whenReady().then(() => {
     return settingsManager.saveSettings(settings)
   })
 
+  // File system related handlers
+  ipcMain.handle('get-folder-tree', () => {
+    try {
+      return fileManager.getFolderTree()
+    } catch (error) {
+      console.error('Error getting folder tree:', error)
+      return null
+    }
+  })
+
+  ipcMain.handle('get-app-folder-path', () => {
+    return fileManager.getAppFolderPath()
+  })
+
+  // Explicitly initialize the markdown manager's IPC handlers
+  // This ensures the handlers are registered at the right time in the app lifecycle
+  markdownManager.initialize()
+  console.log('Markdown manager IPC handlers initialized')
+
   createWindow()
+
+  // Send folder tree to renderer after window is ready
+  mainWindow.webContents.on('did-finish-load', () => {
+    try {
+      const folderTree = fileManager.getFolderTree()
+      mainWindow.webContents.send('folder-tree-updated', folderTree)
+    } catch (error) {
+      console.error('Error sending folder tree to renderer:', error)
+    }
+  })
+
+  //ipc handler for window
+  ipcMain.handle('window:minimize', () => {
+    mainWindow.minimize()
+  })
+
+  ipcMain.handle('window:maximize-restore', () => {
+    mainWindow.maximize()
+  })
+
+  ipcMain.handle('window:close', () => {
+    mainWindow.close()
+  })
+
+  ipcMain.handle('window:is-maximized', () => {
+    return mainWindow.isMaximized()
+  })
+
+  ipcMain.on('window:maximized-change', (_, maximized) => {
+    console.log('window:maximized-change', maximized)
+  })
+
+  ipcMain.removeListener('window:maximized-change', (_, maximized) => {
+    console.log('window:maximized-change', maximized)
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

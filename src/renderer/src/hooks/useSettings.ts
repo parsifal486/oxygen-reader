@@ -1,9 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react'
+import { Settings } from '@shared/types'
 
-interface Settings {
-  theme: 'light' | 'dark' // Theme can be either 'light' or 'dark'
-  appLanguage: string // Application language (e.g., 'en', 'fr')
-}
+
 export const useSettings = (): {
   settings: Settings | null
   loading: boolean
@@ -41,7 +39,7 @@ export const useSettings = (): {
       }
     },
     []
-  );
+  )
 
   return { settings, loading, updateSetting }
-};
+}
