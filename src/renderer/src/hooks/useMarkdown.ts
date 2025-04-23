@@ -12,6 +12,7 @@ interface MarkdownHookResult {
   searchInFiles: (query: string) => Promise<void>
   extractWords: (filePath?: string) => Promise<string[]>
   loadRecentFiles: () => Promise<void>
+  findSentenceWithWord: (text: string, word: string) => string
 }
 
 export const useMarkdown = (): MarkdownHookResult => {
@@ -153,6 +154,23 @@ export const useMarkdown = (): MarkdownHookResult => {
     [currentDocument]
   )
 
+  /**
+   * Find the sentence containing a specific word
+   * @param text Full text to search in
+   * @param word Word to find
+   */
+  const findSentenceWithWord = useCallback((text: string, word: string): string => {
+    // Basic sentence splitting - handles periods, question marks, exclamation marks
+    const sentences = text.split(/(?<=[.!?])\s+/)
+
+    // Find the first sentence containing the word
+    const sentenceWithWord = sentences.find((sentence) =>
+      sentence.toLowerCase().includes(word.toLowerCase())
+    )
+
+    return sentenceWithWord || word
+  }, [])
+
   return {
     currentDocument,
     isLoading,
@@ -163,6 +181,7 @@ export const useMarkdown = (): MarkdownHookResult => {
     saveFile,
     searchInFiles,
     extractWords,
-    loadRecentFiles
+    loadRecentFiles,
+    findSentenceWithWord
   }
 }

@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  MdAdd,
-  MdSettings,
-  MdDarkMode,
-  MdOutlineDarkMode,
-  MdOutlineFolder,
-  MdOutlineFolderOpen
-} from 'react-icons/md'
+import { MdAdd, MdSettings, MdDarkMode, MdOutlineDarkMode } from 'react-icons/md'
 
 import {
   TbLayoutSidebarRightCollapseFilled,
@@ -19,23 +12,19 @@ import {
 interface SideBarProps {
   theme?: string
   toggleTheme: () => void
-  isFileExplorerOpen: boolean
-  toggleFileExplorer: () => void
-  isRightSideBarOpen: boolean
-  toggleRightSideBar: () => void
-  isLeftSideBarOpen: boolean
-  toggleLeftSideBar: () => void
+  isLeftPanelOpen: boolean
+  toggleLeftPanel: () => void
+  isRightPanelOpen: boolean
+  toggleRightPanel: () => void
 }
 
 const SideNavBar: React.FC<SideBarProps> = ({
   theme,
   toggleTheme,
-  isFileExplorerOpen,
-  toggleFileExplorer,
-  isRightSideBarOpen,
-  toggleRightSideBar,
-  isLeftSideBarOpen,
-  toggleLeftSideBar
+  isLeftPanelOpen,
+  toggleLeftPanel,
+  isRightPanelOpen,
+  toggleRightPanel
 }) => {
   return (
     <div className=" flex flex-col items-center  w-12 h-full border-r-1 border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-900 text-black dark:text-white shadow-lg">
@@ -43,10 +32,10 @@ const SideNavBar: React.FC<SideBarProps> = ({
         {/* upsider icons */}
         <div>
           <SideBarIcon icon={<MdAdd size="25px" />} text="new file" />
-          {isFileExplorerOpen ? (
+          {/* {isFileExplorerOpen ? (
             <SideBarIcon
               onClick={() => {
-                toggleFileExplorer()
+                toggleLeftPanel()
               }}
               icon={<MdOutlineFolderOpen size="25px" />}
               text="file explorer"
@@ -59,12 +48,12 @@ const SideNavBar: React.FC<SideBarProps> = ({
               icon={<MdOutlineFolder size="25px" />}
               text="file explorer"
             />
-          )}
+          )} */}
 
-          {isLeftSideBarOpen ? (
+          {isLeftPanelOpen ? (
             <SideBarIcon
               onClick={() => {
-                toggleLeftSideBar()
+                toggleLeftPanel()
               }}
               icon={<TbLayoutSidebarLeftCollapseFilled size="25px" />}
               text="left side bar"
@@ -72,17 +61,17 @@ const SideNavBar: React.FC<SideBarProps> = ({
           ) : (
             <SideBarIcon
               onClick={() => {
-                toggleLeftSideBar()
+                toggleLeftPanel()
               }}
               icon={<TbLayoutSidebarLeftCollapse size="25px" />}
               text="left side bar"
             />
           )}
 
-          {isRightSideBarOpen ? (
+          {isRightPanelOpen ? (
             <SideBarIcon
               onClick={() => {
-                toggleRightSideBar()
+                toggleRightPanel()
               }}
               icon={<TbLayoutSidebarRightCollapseFilled size="25px" />}
               text="right side bar"
@@ -90,7 +79,7 @@ const SideNavBar: React.FC<SideBarProps> = ({
           ) : (
             <SideBarIcon
               onClick={() => {
-                toggleRightSideBar()
+                toggleRightPanel()
               }}
               icon={<TbLayoutSidebarRightCollapse size="25px" />}
               text="right side bar"

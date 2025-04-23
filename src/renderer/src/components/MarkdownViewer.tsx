@@ -8,14 +8,17 @@ import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 interface MarkdownViewerProps {
   filePath?: string
+  onWordSelect?: (word: string, sentence?: string) => void
 }
 
-const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ filePath }) => {
-  const { currentDocument, isLoading, error, openFile, saveFile } = useMarkdown()
+const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ filePath, onWordSelect }) => {
+  const { currentDocument, isLoading, error, openFile, saveFile, findSentenceWithWord } =
+    useMarkdown()
 
   const [content, setContent] = useState<string>('')
   const [isEditMode, setIsEditMode] = useState<boolean>(false)
   const [editContent, setEditContent] = useState<string>('')
+  const [selectedWord, setSelectedWord] = useState<string>('')
 
   useEffect(() => {
     if (filePath) {
@@ -44,6 +47,55 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ filePath }) => {
       setContent(editContent)
     }
     setIsEditMode(false)
+  }
+
+  const handleWordClick = (e: React.MouseEvent<HTMLSpanElement>, word: string): void => {
+    if (!isEditMode && onWordSelect) {
+      // Clean the word from punctuation
+      const cleanWord = word.replace(/[^\w\s']/g, '').trim()
+      if (cleanWord.length > 0) {
+        setSelectedWord(cleanWord.toLowerCase())
+        const sentence = findSentenceWithWord(content, word)
+        onWordSelect(cleanWord, sentence)
+      }
+    }
+  }
+
+  // Splits text into words and makes each clickable
+  const renderClickableText = (text: string): JSX.Element => {
+    if (!text) return <></>
+
+    // Split text into words but preserve punctuation and spaces
+    const wordPattern = /(\w+[-']\w+|\w+|[^\w\s]+|\s+)/g
+    const tokens = text.match(wordPattern) || []
+
+    return (
+      <>
+        {tokens.map((token, index) => {
+          // If it's a word (not punctuation or whitespace), make it clickable
+          if (/^\w+[-']\w+$|^\w+$/.test(token)) {
+            const isSelected = selectedWord && token.toLowerCase() === selectedWord
+            return (
+              <span
+                key={index}
+                onClick={(e) => handleWordClick(e, token)}
+                className={`cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 border-2 
+                  ${
+                    isSelected
+                      ? 'border-green-500 bg-green-200 dark:bg-green-800 dark:border-green-400'
+                      : 'border-gray-400 dark:border-gray-500 bg-gray-400 dark:bg-gray-500'
+                  } 
+                  hover:rounded px-0.5 transition-colors rounded-md`}
+              >
+                {token}
+              </span>
+            )
+          }
+          // Otherwise return the token as is (punctuation, whitespace)
+          return <span key={index}>{token}</span>
+        })}
+      </>
+    )
   }
 
   if (isLoading) {
@@ -120,10 +172,20 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ filePath }) => {
                 h4: ({ ...props }) => <h4 className="text-base font-bold mt-3 mb-2" {...props} />,
                 h5: ({ ...props }) => <h5 className="text-sm font-bold mt-3 mb-1" {...props} />,
                 h6: ({ ...props }) => <h6 className="text-xs font-bold mt-3 mb-1" {...props} />,
-                p: ({ ...props }) => <p className="my-3" {...props} />,
+                // Make paragraph text clickable
+                p: ({ children, ...props }) => (
+                  <p className="my-3" {...props}>
+                    {typeof children === 'string' ? renderClickableText(children) : children}
+                  </p>
+                ),
+                // Make list items clickable
+                li: ({ children, ...props }) => (
+                  <li className="my-1" {...props}>
+                    {typeof children === 'string' ? renderClickableText(children) : children}
+                  </li>
+                ),
                 ul: ({ ...props }) => <ul className="list-disc pl-6 my-3" {...props} />,
                 ol: ({ ...props }) => <ol className="list-decimal pl-6 my-3" {...props} />,
-                li: ({ ...props }) => <li className="my-1" {...props} />,
                 a: ({ ...props }) => (
                   <a className="text-blue-600 dark:text-blue-400 hover:underline" {...props} />
                 ),

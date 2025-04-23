@@ -9,12 +9,12 @@ import {
 } from 'react-icons/md'
 import { FolderItem, FileItem } from '@shared/types'
 
-interface LeftPanelProps {
+interface FileExplorerProps {
   folderTree: FolderItem
   onFileSelect?: (filePath: string) => void
 }
 
-const LeftPanel: React.FC<LeftPanelProps> = ({ folderTree, onFileSelect }) => {
+const FileExplorer: React.FC<FileExplorerProps> = ({ folderTree, onFileSelect }) => {
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null)
 
   const handleFileSelect = (filePath: string): void => {
@@ -25,19 +25,9 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ folderTree, onFileSelect }) => {
   }
 
   return (
-    <div className="items-center justify-center h-full min-w-50 bg-gray-200 border-1 border-gray-300 dark:border-gray-700 dark:bg-gray-900 text-black dark:text-white shadow-lg">
-      {/* menu bar */}
-      <div className="flex flex-row items-center justify-evenly w-full h-10 bg-gray-200 dark:bg-gray-900 text-black dark:text-white">
-        <MenuIcon icon={<MdOutlineNoteAdd size="25px" />} text="NewFile" onClick={() => {}} />
-        <MenuIcon
-          icon={<MdOutlineCreateNewFolder size="25px" />}
-          text="NewFolder"
-          onClick={() => {}}
-        />
-      </div>
-
+    <div className="flex flex-col w-full h-full">
       {/* file explorer - directly render children of root folder */}
-      <div className="items-center justify-center w-full h-full overflow-y-auto max-h-[calc(100vh-90px)]">
+      <div className="w-full h-full overflow-y-auto max-h-[calc(100vh-90px)]">
         {folderTree.children
           .filter((child) => child.name !== '.DS_Store')
           .sort((a, b) => {
@@ -161,4 +151,4 @@ const MenuIcon = ({
   )
 }
 
-export default LeftPanel
+export default FileExplorer
