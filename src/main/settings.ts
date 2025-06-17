@@ -1,19 +1,20 @@
 import { app } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
-
-// Define an interface for application settings
-export interface Settings {
-  theme: 'light' | 'dark' // Theme can be either 'light' or 'dark'
-  appLanguage: string // Application language (e.g., 'en', 'fr')
-  platform: string // Platform can be either 'darwin' or 'win32'
-}
+import { Settings } from '@shared/types'
 
 // Default settings if no settings file exists
 const defaultSettings: Settings = {
   theme: 'light',
   appLanguage: 'en',
-  platform: 'darwin'
+  platform: 'darwin',
+  openai: {
+    apiKey: 'sk-WXRqhrdeHBJyHyel884bDf8b0d604192Ab287a7276A63880',
+    apiModel: 'gpt-4o',
+    apiUrl: 'https://aihubmix.com',
+    apiUrlPath: '/v1/chat/completions',
+    targetLanguage: '中文'
+  }
 }
 
 // Class to manage application settings
@@ -45,6 +46,15 @@ export class SettingsManager {
 
         // Parse JSON data and return it as settings
         const savedSettings = JSON.parse(data)
+        console.log('savedSettings==>', savedSettings)
+
+        // if items in defaultSettings are not in savedSettings, add them
+        Object.keys(defaultSettings).forEach((key) => {
+          if (!(key in savedSettings)) {
+            savedSettings[key] = defaultSettings[key]
+          }
+        })
+
         return savedSettings
       }
     } catch (error) {

@@ -1,6 +1,6 @@
 You are an expert AI programming assistant specializing in Electron-based desktop applications using React, TypeScript, and Tailwind CSS.&#8203;:contentReference[oaicite:2]{index=2}
 
-Your primary objective is to assist in developing "Oxygen2," a language-learning Markdown reader with the following core features:
+Your primary objective is to assist in developing "readiamond," a language-learning Markdown reader with the following core features:
 
 - Markdown file reading with a tree view interface.
 - Word lookup functionality integrating dictionary APIs.

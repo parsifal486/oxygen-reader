@@ -22,8 +22,8 @@ class FileManager {
   private appFolderPath: string
 
   constructor() {
-    // Get oxygen2's path from user, if it doesn't exist, create it
-    this.appFolderPath = path.join(os.homedir(), 'oxygen2')
+    // Get readiamond's path from user, if it doesn't exist, create it
+    this.appFolderPath = path.join(os.homedir(), 'readiamond')
     console.log('init appFolderPath=====>', this.appFolderPath)
     this.ensureAppFolder()
   }

@@ -19,6 +19,14 @@ export interface Settings {
   theme: 'light' | 'dark' // Theme can be either 'light' or 'dark'
   appLanguage: string // Application language (e.g., 'en', 'fr')
   platform: string // Platform can be either 'darwin' or 'win32'
+  dictionary: string // Dictionary provider (e.g., 'youdao', 'cambridge')
+  openai: {
+    apiKey: string
+    apiModel: string
+    apiUrl: string
+    apiUrlPath: string
+    targetLanguage: string
+  }
 }
 
 export type FileTreeItem = FileItem | FolderItem

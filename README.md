@@ -1,8 +1,8 @@
-# oxygen2
+# readiamond
 
 ## 1.Product Overview
 
-1.1 ProductName: Oxygen2
+1.1 ProductName: readiamond
 1.2 Product Goal
 To provide a Markdown reader focused on Language learning(especialy English rightnow, but more Language is expected to support in the future) by offering features like word lookup, vocabulary note management, example sentence support, and vocabulary flashcard generation. By integrating Dictionary and spaced repetition algorithms, the application helps users efficiently learn words while reading English texts.
 1.3 Target Audience
@@ -74,12 +74,26 @@ Todo:
 codeReview:
 https://www.zhihu.com/people/catchen
 
+- feature to be implemented
 
-- [x] window control on windows
-- [x] apply alias of css and tsx
-- [x] apply state management
-- [x] file tree display
-- [x] left panel swicth
-- [x] right panel init
-- [x] word display
-- [ ] file floder create and control
+* [x] window control on windows
+* [x] apply alias of css and tsx
+* [x] apply state management
+* [x] file tree display
+* [x] left panel swicth
+* [x] right panel init
+* [x] word display
+* [ ] file floder create and control
+
+- defect need to be fixed
+
+* [x] sentence disoplay logic repair
+* [ ] database inteactlogic
+* [ ] add properties for spaced review
+
+currently working on:
+
+- [x] mock data to dajust the style of flashcard
+- [x] setting manage page
+- [ ] scroll bar optomization
+- [ ] intergate anki-sm2

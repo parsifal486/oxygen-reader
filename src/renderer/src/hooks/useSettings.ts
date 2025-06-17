@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Settings } from '@shared/types'
 
-
 export const useSettings = (): {
   settings: Settings | null
   loading: boolean

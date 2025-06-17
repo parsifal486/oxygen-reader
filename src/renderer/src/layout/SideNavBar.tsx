@@ -5,7 +5,9 @@ import {
   TbLayoutSidebarRightCollapseFilled,
   TbLayoutSidebarRightCollapse,
   TbLayoutSidebarLeftCollapseFilled,
-  TbLayoutSidebarLeftCollapse
+  TbLayoutSidebarLeftCollapse,
+  TbCardsFilled,
+  TbCards
 } from 'react-icons/tb'
 
 /* eslint-disable react/prop-types */
@@ -16,6 +18,10 @@ interface SideBarProps {
   toggleLeftPanel: () => void
   isRightPanelOpen: boolean
   toggleRightPanel: () => void
+  isFlashcardsOpen: boolean
+  toggleFlashcards: () => void
+  isSettingsOpen?: boolean
+  toggleSettings: () => void
 }
 
 const SideNavBar: React.FC<SideBarProps> = ({
@@ -24,7 +30,10 @@ const SideNavBar: React.FC<SideBarProps> = ({
   isLeftPanelOpen,
   toggleLeftPanel,
   isRightPanelOpen,
-  toggleRightPanel
+  toggleRightPanel,
+  isFlashcardsOpen,
+  toggleFlashcards,
+  toggleSettings
 }) => {
   return (
     <div className=" flex flex-col items-center  w-12 h-full border-r-1 border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-gray-900 text-black dark:text-white shadow-lg">
@@ -87,7 +96,26 @@ const SideNavBar: React.FC<SideBarProps> = ({
           )}
         </div>
         {/* bottom icons */}
+
         <div>
+          {isFlashcardsOpen ? (
+            <SideBarIcon
+              onClick={() => {
+                toggleFlashcards()
+              }}
+              icon={<TbCardsFilled size="25px" />}
+              text="flashcards"
+            />
+          ) : (
+            <SideBarIcon
+              onClick={() => {
+                toggleFlashcards()
+              }}
+              icon={<TbCards size="25px" />}
+              text="flashcards"
+            />
+          )}
+
           {theme === 'dark' ? (
             <SideBarIcon
               onClick={() => {
@@ -105,7 +133,14 @@ const SideNavBar: React.FC<SideBarProps> = ({
               text="light mode"
             />
           )}
-          <SideBarIcon icon={<MdSettings size="25px" />} text="settings" />
+
+          <SideBarIcon
+            onClick={() => {
+              toggleSettings()
+            }}
+            icon={<MdSettings size="25px" />}
+            text="settings"
+          />
         </div>
       </div>
     </div>

@@ -163,12 +163,13 @@ export const useMarkdown = (): MarkdownHookResult => {
     // Basic sentence splitting - handles periods, question marks, exclamation marks
     const sentences = text.split(/(?<=[.!?])\s+/)
 
-    // Find the first sentence containing the word
-    const sentenceWithWord = sentences.find((sentence) =>
-      sentence.toLowerCase().includes(word.toLowerCase())
-    )
+    // Find the sentence containing the word
+    const targetSentence = sentences.find((sentence) => {
+      const words = sentence.split(/\s+/)
+      return words.some((w) => w.toLowerCase() === word.toLowerCase())
+    })
 
-    return sentenceWithWord || word
+    return targetSentence || word // Return the sentence or the word as fallback
   }, [])
 
   return {

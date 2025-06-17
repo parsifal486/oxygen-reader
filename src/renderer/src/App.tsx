@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSettings } from './hooks/useSettings'
 import { useFiles } from './hooks/useFiles'
 import NavBar from '@renderer/layout/NavBar'
@@ -6,20 +6,31 @@ import LeftPanel from '@renderer/layout/LeftPanel'
 import RightPanel from '@renderer/layout/RightPanel'
 import MarkdownViewer from '@/components/MarkdownViewer'
 import SideNavBar from '@renderer/layout/SideNavBar'
+import FlashcardViewer from '@/components/FlashcardViewer'
+import SettingsDialog from '@/components/SettingsDialog'
+import { requestManager } from './services/llmService'
 
 function App(): JSX.Element {
+  // Constants for request keys
+  const WORD_LOOKUP_REQUEST_KEY = 'word-lookup'
+
   //settings
   const { settings, loading: settingsLoading, updateSetting } = useSettings()
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   //left panel
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(false)
   const [leftPanelType, setLeftPanelType] = useState<'fileExplorer' | 'dictionary'>('fileExplorer')
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null)
-  const [selectedWord, setSelectedWord] = useState<string | null>(null)
+  const [selectedExpression, setSelectedWord] = useState<string | null>(null)
   const [selectedSentence, setSelectedSentence] = useState<string | null>(null)
 
   //right panel
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false)
+
+  //flashcards
+  const [isFlashcardsOpen, setIsFlashcardsOpen] = useState(false)
+  const flashcardContainerRef = useRef<HTMLDivElement>(null)
 
   const { folderTree, loading: filesLoading } = useFiles()
   console.log('folderTree====> ==>', filesLoading, folderTree)
@@ -27,7 +38,6 @@ function App(): JSX.Element {
   useEffect(() => {
     if (settings && !settingsLoading) {
       //Apply theme from settings
-      console.log('get settings in renderer', settings)
       if (settings.theme === 'dark') {
         document.documentElement.classList.add('dark')
       } else {
@@ -37,11 +47,38 @@ function App(): JSX.Element {
   }, [settings, settingsLoading])
 
   useEffect(() => {
-    if (selectedWord) {
-      // Will be implemented later to fetch dictionary definitions
-      console.log(`Will look up definition for: ${selectedWord}`)
+    if (selectedExpression) {
+      // When a word is selected, open left panel and switch to dictionary
+      if (!isLeftPanelOpen) {
+        setIsLeftPanelOpen(true)
+      }
+
+      // Switch to dictionary view
+      setLeftPanelType('dictionary')
+
+      console.log(`Will look up definition for: ${selectedExpression}`)
     }
-  }, [selectedWord])
+  }, [selectedExpression])
+
+  // Handle click outside of flashcard container to close it
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent): void {
+      if (
+        flashcardContainerRef.current &&
+        !flashcardContainerRef.current.contains(event.target as Node)
+      ) {
+        setIsFlashcardsOpen(false)
+      }
+    }
+
+    if (isFlashcardsOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return (): void => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isFlashcardsOpen])
 
   const toggleTheme = (): void => {
     const newTheme = settings?.theme === 'dark' ? 'light' : 'dark'
@@ -57,11 +94,22 @@ function App(): JSX.Element {
     setIsRightPanelOpen(!isRightPanelOpen)
   }
 
+  const toggleFlashcards = (): void => {
+    setIsFlashcardsOpen(!isFlashcardsOpen)
+  }
+
+  const toggleSettings = (): void => {
+    setIsSettingsOpen(!isSettingsOpen)
+  }
+
   const handleFileSelect = (filePath: string): void => {
     setSelectedFilePath(filePath)
   }
 
   const handleWordSelect = (word: string, sentence?: string): void => {
+    // Cancel any ongoing word lookup request before starting a new one
+    requestManager.cancelRequest(WORD_LOOKUP_REQUEST_KEY)
+
     setSelectedWord(word)
     if (sentence) {
       setSelectedSentence(sentence)
@@ -70,7 +118,6 @@ function App(): JSX.Element {
     if (!isRightPanelOpen) {
       setIsRightPanelOpen(true)
     }
-    console.log('Selected word:', word, 'in sentence:', sentence || 'N/A')
   }
 
   return (
@@ -85,6 +132,10 @@ function App(): JSX.Element {
           toggleLeftPanel={toggleLeftPanel}
           isRightPanelOpen={isRightPanelOpen}
           toggleRightPanel={toggleRightPanel}
+          isFlashcardsOpen={isFlashcardsOpen}
+          toggleFlashcards={toggleFlashcards}
+          isSettingsOpen={isSettingsOpen}
+          toggleSettings={toggleSettings}
         />
         {/* {if folderTree is null, show tip to create a new folder} */}
         {isLeftPanelOpen && (
@@ -94,6 +145,9 @@ function App(): JSX.Element {
             folderTree={folderTree}
             onFileSelect={handleFileSelect}
             onWordSelect={handleWordSelect}
+            selectedWord={selectedExpression}
+            selectedSentence={selectedSentence}
+            wordLookupRequestKey={WORD_LOOKUP_REQUEST_KEY}
           />
         )}
 
@@ -109,10 +163,23 @@ function App(): JSX.Element {
         {isRightPanelOpen && (
           <RightPanel
             isOpen={isRightPanelOpen}
-            selectedWord={selectedWord}
+            selectedExpression={selectedExpression}
             selectedSentence={selectedSentence}
+            wordLookupRequestKey={WORD_LOOKUP_REQUEST_KEY}
           />
         )}
+
+        {/* Flashcard dialog */}
+        {isFlashcardsOpen && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div ref={flashcardContainerRef} className="relative">
+              <FlashcardViewer />
+            </div>
+          </div>
+        )}
+
+        {/* Settings dialog */}
+        <SettingsDialog isOpen={isSettingsOpen} onClose={toggleSettings} />
       </div>
     </div>
   )

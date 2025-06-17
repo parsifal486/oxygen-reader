@@ -18,8 +18,8 @@ let mainWindow: BrowserWindow
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 670,
+    width: 1280,
+    height: 820,
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',
@@ -76,7 +76,7 @@ app.whenReady().then(() => {
 
   // Create tray icon
   const tray = new Tray(appIcon)
-  tray.setToolTip('Oxygen2')
+  tray.setToolTip('Readiamond')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

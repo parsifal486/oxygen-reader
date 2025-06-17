@@ -6,10 +6,13 @@ import Dictionary from '../components/Dictionary'
 
 interface LeftPanelProps {
   leftPanelType: 'fileExplorer' | 'dictionary'
-  setLeftPanelType: (leftPanelType: 'fileExplorer' | 'dictionary') => void
+  setLeftPanelType: React.Dispatch<React.SetStateAction<'fileExplorer' | 'dictionary'>>
   folderTree: FolderItem | null
-  onFileSelect?: (filePath: string) => void
-  onWordSelect?: (word: string) => void
+  onFileSelect: (filePath: string) => void
+  onWordSelect?: (word: string, sentence?: string) => void
+  selectedWord?: string | null
+  selectedSentence?: string | null
+  wordLookupRequestKey?: string
 }
 
 const LeftPanel: React.FC<LeftPanelProps> = ({
@@ -17,10 +20,13 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   setLeftPanelType,
   folderTree,
   onFileSelect,
-  onWordSelect
+  onWordSelect,
+  selectedWord,
+  selectedSentence,
+  wordLookupRequestKey
 }) => {
   return (
-    <div className="flex flex-col h-full min-w-64 bg-gray-200 border-1 border-gray-300 dark:border-gray-700 dark:bg-gray-900 text-black dark:text-white shadow-lg">
+    <div className="flex flex-col h-full min-w-2xs max-w-64 bg-gray-200 border-1 border-gray-300 dark:border-gray-700 dark:bg-gray-900 text-black dark:text-white shadow-lg">
       {/* Panel type switcher */}
       <div className="flex flex-row items-center justify-evenly w-full h-10 bg-gray-200 dark:bg-gray-900 text-black dark:text-white border-gray-400 dark:border-gray-600">
         <button
@@ -67,7 +73,12 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
             </div>
           )
         ) : (
-          <Dictionary onWordSelect={onWordSelect} />
+          <Dictionary
+            onWordSelect={onWordSelect}
+            selectedWord={selectedWord}
+            selectedSentence={selectedSentence}
+            wordLookupRequestKey={wordLookupRequestKey}
+          />
         )}
       </div>
     </div>

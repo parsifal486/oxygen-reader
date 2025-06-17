@@ -1,11 +1,11 @@
 {
-  "name": "oxygen2",
+  "name": "readiamond",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "a markdown reader for language learning",
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://electron-vite.org",
-  "productName": "Oxygen2",
+  "productName": "Readiamond",
   "build": {
     "mac": {
       "icon": "./public/icon.png"
@@ -30,6 +30,8 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
     "@tailwindcss/vite": "^4.0.12",
+    "dexie": "^4.0.11",
+    "dexie-react-hooks": "^1.1.7",
     "react-icons": "^5.5.0",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.1",
